@@ -29,10 +29,18 @@ function parseMarkdown(markdown) {
             }
             continue;
         }
+        if (!inPreformatted) {
+            if (!inParagraph) {
+                html += '<p>';
+                inParagraph = true;
+            }
+            line = line
+                .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+                .replace(/_(.*?)_/g, '<i>$1</i>')
+                .replace(/`(.*?)`/g, '<tt>$1</tt>');
+        }
 
-
+        html += inPreformatted ? line + '\n' : line.trim() + ' ';
     }
-
-
     return html;
-    }
+}
