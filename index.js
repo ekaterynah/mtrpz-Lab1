@@ -44,3 +44,51 @@ function parseMarkdown(markdown) {
     }
     return html;
 }
+
+function main() {
+    const args = process.argv.slice(2);
+    if (args.length === 0) {
+        console.error('Error: No input file specified');
+        process.exit(1);
+    }
+
+    const inputFilePath = args[0];
+    const outputFlagIndex = args.indexOf('--out');
+    let outputFilePath = null;
+
+    if (outputFlagIndex !== -1) {
+        if (outputFlagIndex + 1 >= args.length) {
+            console.error('Error: No output file specified');
+            process.exit(1);
+        }
+        outputFilePath = args[outputFlagIndex + 1];
+    }
+
+    fs.readFile(inputFilePath, 'utf8', (err, data) => {
+        if (err) {
+            console.error(`Error: Unable to read file ${inputFilePath}`);
+            process.exit(1);
+        }
+
+        let html;
+        try {
+            html = parseMarkdown(data);
+        } catch (err) {
+            console.error(`Error: invalid markdown: ${err.message}`);
+            process.exit(1);
+        }
+
+        if (outputFilePath) {
+            fs.writeFile(outputFilePath, html, (err) => {
+                if (err) {
+                    console.error(`Error: Unable to write to file ${outputFilePath}`);
+                    process.exit(1);
+                }
+            });
+        } else {
+            console.log(html);
+        }
+    });
+}
+
+main();
